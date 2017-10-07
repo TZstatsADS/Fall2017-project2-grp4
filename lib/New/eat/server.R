@@ -2,6 +2,7 @@
 
 shinyServer = function(input, output, session) {
   
+  
   #####Create route dataframe
   route_df <- reactive({
     route_df <- route(input$from, input$to, structure = 'route', mode = 'transit',output = "simple")# transit
@@ -66,24 +67,44 @@ shinyServer = function(input, output, session) {
   })
   
   #####Create Palette Variable
-  factpal = reactive({
-    return(colorFactor(rainbow(5), ctb()[,'price']))
+  color = function(){
+    return(colorFactor(rainbow(5), ctb()$price))
+  }
+  
+  #####Create a complete route dataframe
+  route_df2 = reactive({
+    return(cbind(route_df(),mean_stop =round(tapply(ctb()$rating,ctb()$stop,mean),2)))
   })
   
-  #####
-  route_df = reactive({
-    return(round(tapply(ctb()$rating,ctb()$stop,mean),2))
-  })
   
   #####Create map
-  
-  
-  
-  
-  #####
-  output$try = renderText({
-    print(route_df()$lat[1])
+  output$Map = renderLeaflet({
+    route_df2() %>% leaflet() %>% addTiles() %>%
+      addMarkers(route_df2()$lon, route_df2()$lat, popup = paste(route_df2()$content,"<br>",
+                                                               "Overall Rating: ", "<b>",route_df2()$mean_stop,"</b>"))%>%
+      addCircles(lng = ~lon, lat = ~lat, weight = 1,radius =1609* input$in_mile)%>%
+      addPolylines(~lon, ~lat,color="red")%>%
+      addCircleMarkers(ctb()$longitude, ctb()$latitude, radius = ctb()$rating+1, stroke = FALSE, # add 1 to make points bigger
+                       fillOpacity = ((ctb()$review_count - min(ctb()$review_count)) / max(ctb()$review_count - min(ctb()$review_count)))+0.4,
+                       color = ~{color = colorFactor(rainbow(5), ctb()$price)
+                       color(ctb()$price)}, 
+                       popup = paste("<b><a href=", "'",ctb()$url,"'>", ctb()$name, "</a></b>","<br>",
+                                     "Address: ",ctb()$address ,"<br>",
+                                     "Phone: ", "<a href=tel:", "'",ctb()$display_phone,"'>", ctb()$display_phone, "</a>","<br>",
+                                     "Rating: ", ctb()$rating, "<br>"
+                       ))%>%
+      addLegend(pal = colorFactor(rainbow(5), ctb()$price), values = ctb()$price,
+                title = "Price Range",
+                opacity = 1
+      )
   })
+  
+  
+  
+  #####Try to see some value
+  #output$try = renderText({
+    #print()
+  #})
   
   
 }

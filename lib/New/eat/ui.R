@@ -26,21 +26,21 @@ dashboardPage(
     numericInput("in_mile","Max dist from your route (mi)",0.2, min = 0.1, max = 5),
     sliderInput("minStar","Minimum # of stars on Yelp",min = 1, max = 5, value = 1),
     sliderInput("price","Price Range",min = 1, max = 4, value = 1),
-    submitButton("Submit",width='80%')
+    submitButton("Submit",width='100%')
   ),
   
   dashboardBody(
     fluidRow(
-      column(width = 7,
+      column(width = 12,
              box(width = NULL, solidHeader = TRUE,
                  leafletOutput("Map")))),
     fluidRow(
-      column(width=7,
+      column(width=12,
              box(width = NULL, solidHeader = TRUE,
                  verbatimTextOutput("Click_text")),
                  htmlOutput("image"))),
     fluidRow(
-      column(width = 7, box(width = NULL,  textOutput('try')))
+      column(width = 12, box(width = NULL,  textOutput('try')))
     )
   )
 )
