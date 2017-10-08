@@ -99,6 +99,11 @@ shinyServer = function(input, output, session) {
       )
   })
   
+  output$cuisine <- renderPrint({
+  input$check
+  })
+  
+
   
   output$Click_review_text<-renderText({
     #browser()
@@ -151,6 +156,8 @@ shinyServer = function(input, output, session) {
                  alt = "Image failed to render")
           })
       })
+  
+  
   #})
   
   #observe({
