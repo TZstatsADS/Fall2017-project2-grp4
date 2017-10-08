@@ -37,14 +37,14 @@ dashboardPage(
     fluidRow(
       column(width=12,
              box(width = NULL, solidHeader = TRUE,
-                 verbatimTextOutput("Click_text")),
-                 htmlOutput("image"))),
-    fluidRow(
-      column(width = 12, box(width = NULL,  textOutput('try')))
+                 verbatimTextOutput("Click_review_text"),
+                 verbatimTextOutput("Click_review_rating"),
+                 verbatimTextOutput("Click_review_time"),
+                 uiOutput("image"))))
+    #fluidRow(
+      #column(width = 12, box(width = NULL,  fluidRow(htmlOutput("picture"))))
     )
-  )
 )
-
 
 
 

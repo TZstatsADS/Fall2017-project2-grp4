@@ -100,6 +100,78 @@ shinyServer = function(input, output, session) {
   })
   
   
+  output$Click_review_text<-renderText({
+    #browser()
+    click<-input$map_marker_click
+    #if(is.null(click))
+      #return(NULL)
+    #else{
+    review_text<-ctb()$review_text[ctb()$id==click$id]
+    return(paste0('The most current review: ',review_text))
+    #}
+  })
+  
+  output$Click_review_rating<-renderText({
+    #browser()
+    click<-input$map_marker_click
+    #if(is.null(click))
+    #return(NULL)
+    #else{
+    review_rating = ctb()$review_rating[ctb()$id==click$id]
+    return(paste0('Rating of the reviewer: ', review_rating))
+    #}
+  })
+  
+  
+  output$Click_review_time<-renderText({
+    #browser()
+    click<-input$map_marker_click
+    #if(is.null(click))
+    #return(NULL)
+    #else{
+    review_time = ctb()$review_time[ctb()$id==click$id]
+    return(paste0('Time of Last Review: ', review_time))
+    #}
+  })
+  
+  #output$image<-renderUI({
+    #click<-input$map_marker_click
+    #if(is.null(click))
+      #return(NULL)
+    #else{
+      #src<-ctb()$image_url[ctb()$id==click$id]
+      #return(tags$img(src=src))
+    #}
+  #})
+  
+  observe({
+    click<-input$map_marker_click
+    output$image <- renderImage({
+            list(src = ctb()$image_url[ctb()$id==click$id],
+                 alt = "Image failed to render")
+          })
+      })
+  #})
+  
+  #observe({
+    #click<-input$map_marker_click
+    #review_text = paste("The most current review:",ctb()$review_text[ctb()$id==click$id])
+    #review_rating = paste("Rating of the reviewer:",ctb$review_rating[ctb$id==click$id])
+    #review_time = paste("the review time:",ctb$review_time[ctb$id==click$id])
+    
+    #map$clearPopups()
+    #map$showPopup(click$lat, click$lng)
+    #output$Click_review_text<-renderText({
+      #(review_text)
+      #})
+    #output$Click_review_rating<-renderText({review_rating})
+    #output$Click_review_time<-renderText({review_time})
+    
+    #output$picture <-
+      #renderText({c('< img src="',ctb()$image_url[ctb()$id==click$id],'">')})
+  #})
+  
+  
   
   #####Try to see some value
   #output$try = renderText({
