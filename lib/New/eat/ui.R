@@ -52,10 +52,18 @@ dashboardPage(
   
   dashboardSidebar(
     width = 310,
+<<<<<<< HEAD
     textInput("from","Enter a Starting Point:",'Time Square,NYC, NY, USA'),
     textInput("to","Enter a Destination:",'Columbus Circle, NYC, NY, USA'),
     numericInput("in_mile","Max Dist From Your Route (mi)",0.2, min = 0.1, max = 5),
     sliderInput("minStar","Minimum # of Stars on Yelp",min = 1, max = 5, value = 1),
+=======
+    textInput("from","Enter starting point:",'Time Square,NYC, NY, USA'),
+    textInput("to","Enter destination:",'Columbus Circle, NYC, NY, USA'),
+    numericInput("in_mile","Max dist from your route (mi)",0.2, min = 0.1, max = 5),
+    div(style="display:inline-block;width:80%;text-align: center;",submitButton("Submit")),
+    sliderInput("minStar","Minimum # of stars on Yelp",min = 1, max = 5, value = 1),
+>>>>>>> 419435136fe8a9b3a09d5eccd51e5c407ede4bb4
     sliderInput("price","Price Range",min = 1, max = 4, value = 1),
     submitButton("Submit / Refresh",width='60%'),
     fluidRow(
