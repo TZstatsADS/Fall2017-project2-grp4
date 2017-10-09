@@ -40,24 +40,24 @@ dropdownButton <- function(label = "", status = c("default", "primary", "success
       e.stopPropagation();
 });")
   )
-  }
+}
 
 
 dashboardPage(
   skin = "purple",
   dashboardHeader(
-    title = 'Restaurants on your way',
+    title = 'Interesting Places on Your Way',
     titleWidth = 310
   ),
   
   dashboardSidebar(
     width = 310,
-    textInput("from","Enter starting point:",'Time Square,NYC, NY, USA'),
-    textInput("to","Enter destination:",'Columbus Circle, NYC, NY, USA'),
-    numericInput("in_mile","Max dist from your route (mi)",0.2, min = 0.1, max = 5),
-    submitButton("Submit",width='60%'),
-    sliderInput("minStar","Minimum # of stars on Yelp",min = 1, max = 5, value = 1),
+    textInput("from","Enter a Starting Point:",'Time Square,NYC, NY, USA'),
+    textInput("to","Enter a Destination:",'Columbus Circle, NYC, NY, USA'),
+    numericInput("in_mile","Max Dist From Your Route (mi)",0.2, min = 0.1, max = 5),
+    sliderInput("minStar","Minimum # of Stars on Yelp",min = 1, max = 5, value = 1),
     sliderInput("price","Price Range",min = 1, max = 4, value = 1),
+    submitButton("Submit / Refresh",width='60%'),
     fluidRow(
       column(width = 6,
         dropdownButton(label = "Select Cuisines", status = "default", width = 80,
@@ -72,14 +72,13 @@ dashboardPage(
              box(width = NULL, solidHeader = TRUE,
                  withSpinner(leafletOutput("map"))))),
     fluidRow(box(width = 8,
-                 verbatimTextOutput("Click_review_text"),
-                 verbatimTextOutput("Click_review_rating"),
-                 verbatimTextOutput("Click_review_time")), box(width = 4, uiOutput("image")))
-    #fluidRow(
-      #column(width = 12, box(width = NULL,  fluidRow(htmlOutput("picture"))))
-    #fluidRow(column(width=12,box(verbatimTextOutput(outputId = 'try'))))
+                 htmlOutput("Click_review_text"),
+                 htmlOutput("Click_review_rating"),
+                 htmlOutput("Click_review_time")), box(width = 4, uiOutput("image")))
   )
 )
+
+
 
 
 

@@ -110,22 +110,16 @@ shinyServer = function(input, output, session) {
       )
   })
   
-  #observeEvent(input$map_marker_click,{
-    #data_of_click$clickedMarker <- input$map_marker_click
-  #})
-    
-  #output$Click_review_text <- renderText({
-      #return(paste0('The most current review: ',ctb()$review_text[ctb()$id==input$map_marker_click$id]))
-  #})
-    
+  
+
   
   observe({
     click = input$map_marker_click
     if(is.null(click))
       return()
-    review_text = paste("The most current review:",ctb()$review_text[ctb()$id==click$id])
-    review_rating = paste("Rating of the reviewer:",ctb()$review_rating[ctb()$id==click$id])
-    review_time = paste("the review time:",ctb()$review_time[ctb()$id==click$id])
+    review_text = paste('<span style="color:#5F5DA3"> The most current review: </span><br>',"<b>",ctb()$review_text[ctb()$id==click$id],"</b>")
+    review_rating = paste('<span style="color:#5F5DA3"> Rating of the Reviewer: </span><br>',"<b>",ctb()$review_rating[ctb()$id==click$id],"</b>")
+    review_time = paste('<span style="color:#5F5DA3"> The Rating Time: </span><br>',"<b>",ctb()$review_time[ctb()$id==click$id],"</b>")
     
 
     output$Click_review_text<-renderText({review_text})
@@ -142,32 +136,11 @@ shinyServer = function(input, output, session) {
       }
     })
   })
-  
-
-    
-    
-  
-  #####Try to see some value
-
-
-  
-  
-  
-  
-  
-  output$image<-renderUI({
-    click<-input$map_marker_click
-    if(is.null(click))
-      return(NULL)
-    else{
-      src<-ctb()$image_url[ctb()$id==click$id]
-      return(tags$img(src=src))
-    }
-  })
-  
-  
-  
-
-  
 }
     
+#output$text1 <- renderText({ paste("hello input is","<font color=\"#FF0000\"><b>", input$n, "</b></font>") })
+
+#paste('<span class="red">',"The most current review:</span>","<br>",ctb()$review_text[ctb()$id==click$id])
+
+
+
