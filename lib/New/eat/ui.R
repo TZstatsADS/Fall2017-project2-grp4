@@ -62,24 +62,22 @@ dashboardPage(
         dropdownButton(label = "Select Cuisines", status = "default", width = 80,
           checkboxGroupInput(inputId = "check", label = "Choose", choices = 1:20)
         ),
-        verbatimTextOutput(outputId = "cuisince")))
+        verbatimTextOutput(outputId = "cuisine")))
   ),
   
   dashboardBody(
     fluidRow(
       column(width = 12,
              box(width = NULL, solidHeader = TRUE,
-                 leafletOutput("Map")))),
-    fluidRow(
-      column(width=12,
-             box(width = NULL, solidHeader = TRUE,
+                 leafletOutput("map")))),
+    fluidRow(box(width = 8,
                  verbatimTextOutput("Click_review_text"),
                  verbatimTextOutput("Click_review_rating"),
-                 verbatimTextOutput("Click_review_time"),
-                 uiOutput("image"))))
+                 verbatimTextOutput("Click_review_time")), box(width = 4, uiOutput("image")))
     #fluidRow(
       #column(width = 12, box(width = NULL,  fluidRow(htmlOutput("picture"))))
-    )
+    #fluidRow(column(width=12,box(verbatimTextOutput(outputId = 'try'))))
+  )
 )
 
 

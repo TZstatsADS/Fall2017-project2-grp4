@@ -97,15 +97,16 @@ route_df=cbind(route_df,mean_stop =round(tapply(ctb$rating,ctb$stop,mean),2))# w
 #Visualization # with stops hyperlink and average rating
 ```{r leaflet}
 # the key part leaflet
-leaflet(route_df) %>% addTiles() %>%
+leaflet() %>% addTiles() %>%
   addMarkers(route_df$lon, route_df$lat, popup = paste(route_df$content,"<br>",
                                                        "Overall Rating: ", "<b>",route_df$mean_stop,"</b>"))%>%
-  addCircles(lng = ~lon, lat = ~lat, weight = 1,radius =1609*in_mile)%>%
-  addPolylines(~lon, ~lat,color="red")%>%
-  addCircleMarkers(ctb$longitude, ctb$latitude, radius = ctb$rating+1, stroke = FALSE, # add 1 to make points bigger
+  addCircles(lng = route_df$lon, lat = route_df$lat, weight = 1,radius =1609*in_mile)%>%
+  addPolylines(lng = route_df$lon, lat = route_df$lat,color="red")%>%
+  addCircleMarkers(data = ctb,ctb$longitude, ctb$latitude, radius = ctb$rating+1, stroke = FALSE, # add 1 to make points bigger
                    fillOpacity = ((ctb$review_count - min(ctb$review_count)) / max(ctb$review_count - min(ctb$review_count)))+0.4,
                    color = ~{color = colorFactor(rainbow(5), ctb$price)
                    color(ctb$price)}, 
+                   layerId = ctb$id,
                    popup = paste("<b><a href=", "'",ctb$url,"'>", ctb$name, "</a></b>","<br>",
                                  "Address: ",ctb$address ,"<br>",
                                  "Phone: ", "<a href=tel:", "'",ctb$display_phone,"'>", ctb$display_phone, "</a>","<br>",
@@ -121,7 +122,7 @@ leaflet(route_df) %>% addTiles() %>%
 ```{r review and rate} 
 for (i in 1:dim(ctb)[1]){
   url_rev_i = paste0("https://api.yelp.com/v3/businesses/",ctb$id[i],"/reviews")
-  res_rev_i=GET(url_rev_i, add_headers('Authorization' = paste("bearer", token_rev)))
+  res_rev_i=GET(url_rev_i, add_headers('Authorization' = paste("bearer", token)))
   ctb$review_time[i] = content(res_rev_i)$review[[1]]$time_created # for review created time need to change
   ctb$review_rating[i] = content(res_rev_i)$review[[1]]$rating
   ctb$review_text[i] = content(res_rev_i)$review[[1]]$text

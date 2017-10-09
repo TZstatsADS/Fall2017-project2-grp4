@@ -63,6 +63,15 @@ shinyServer = function(input, output, session) {
     colnames(ctb) = c("id","name","image_url","url","review_count","rating","price","display_phone","latitude","longitude","address","zip code","category","stop")
     
     ctb$price = factor(ctb$price)
+    
+    for (i in 1:dim(ctb)[1]){
+      url_rev_i = paste0("https://api.yelp.com/v3/businesses/",ctb$id[i],"/reviews")
+      res_rev_i=GET(url_rev_i, add_headers('Authorization' = paste("bearer", token)))
+      ctb$review_time[i] = content(res_rev_i)$review[[1]]$time_created # for review created time need to change
+      ctb$review_rating[i] = content(res_rev_i)$review[[1]]$rating
+      ctb$review_text[i] = content(res_rev_i)$review[[1]]$text
+    }
+    
     return(ctb)
   })
   
@@ -78,113 +87,89 @@ shinyServer = function(input, output, session) {
   
   
   #####Create map
-  output$Map = renderLeaflet({
-    route_df2() %>% leaflet() %>% addTiles() %>%
+  
+  #data_of_click <- reactiveValues(clickedMarker=NULL)
+    
+  output$map = renderLeaflet({
+     leaflet() %>% addTiles() %>%
       addMarkers(route_df2()$lon, route_df2()$lat, popup = paste(route_df2()$content,"<br>",
-                                                               "Overall Rating: ", "<b>",route_df2()$mean_stop,"</b>"))%>%
-      addCircles(lng = ~lon, lat = ~lat, weight = 1,radius =1609* input$in_mile)%>%
-      addPolylines(~lon, ~lat,color="red")%>%
-      addCircleMarkers(ctb()$longitude, ctb()$latitude, radius = ctb()$rating+1, stroke = FALSE, # add 1 to make points bigger
+                                                                 "Overall Rating: ", "<b>",route_df2()$mean_stop,"</b>"))%>%
+      addCircles(lng = route_df2()$lon, lat = route_df2()$lat, weight = 1,radius =1609* input$in_mile)%>%
+      addPolylines(lng = route_df2()$lon, lat = route_df2()$lat,color="red")%>%
+      addCircleMarkers(data = ctb(),lng = ctb()$longitude, lat = ctb()$latitude, radius = ctb()$rating+1, stroke = FALSE, # add 1 to make points bigger
                        fillOpacity = ((ctb()$review_count - min(ctb()$review_count)) / max(ctb()$review_count - min(ctb()$review_count)))+0.4,
                        color = ~{color = colorFactor(rainbow(5), ctb()$price)
-                       color(ctb()$price)}, 
+                       color(ctb()$price)},
+                       layerId = ctb()$id,
                        popup = paste("<b><a href=", "'",ctb()$url,"'>", ctb()$name, "</a></b>","<br>",
                                      "Address: ",ctb()$address ,"<br>",
                                      "Phone: ", "<a href=tel:", "'",ctb()$display_phone,"'>", ctb()$display_phone, "</a>","<br>",
                                      "Rating: ", ctb()$rating, "<br>"
-                       ))%>%
+                      ))%>%
       addLegend(pal = colorFactor(rainbow(5), ctb()$price), values = ctb()$price,
                 title = "Price Range",
                 opacity = 1
       )
   })
   
-  output$cuisine <- renderPrint({
-  input$check
+  #observeEvent(input$map_marker_click,{
+    #data_of_click$clickedMarker <- input$map_marker_click
+  #})
+    
+  #output$Click_review_text <- renderText({
+      #return(paste0('The most current review: ',ctb()$review_text[ctb()$id==input$map_marker_click$id]))
+  #})
+    
+  
+  observe({
+    click = input$map_marker_click
+    if(is.null(click))
+      return()
+    review_text = paste("The most current review:",ctb()$review_text[ctb()$id==click$id])
+    review_rating = paste("Rating of the reviewer:",ctb()$review_rating[ctb()$id==click$id])
+    review_time = paste("the review time:",ctb()$review_time[ctb()$id==click$id])
+    
+
+    output$Click_review_text<-renderText({review_text})
+    output$Click_review_rating<-renderText({review_rating})
+    output$Click_review_time<-renderText({review_time})
+    
+    output$image<-renderUI({
+      click<-input$map_marker_click
+      if(is.null(click))
+        return(NULL)
+      else{
+        src<-ctb()$image_url[ctb()$id==click$id]
+        return(tags$img(src=src, width = '200px', height='200px'))
+      }
+    })
   })
   
 
-  
-  output$Click_review_text<-renderText({
-    #browser()
-    click<-input$map_marker_click
-    #if(is.null(click))
-      #return(NULL)
-    #else{
-    review_text<-ctb()$review_text[ctb()$id==click$id]
-    return(paste0('The most current review: ',review_text))
-    #}
-  })
-  
-  output$Click_review_rating<-renderText({
-    #browser()
-    click<-input$map_marker_click
-    #if(is.null(click))
-    #return(NULL)
-    #else{
-    review_rating = ctb()$review_rating[ctb()$id==click$id]
-    return(paste0('Rating of the reviewer: ', review_rating))
-    #}
-  })
-  
-  
-  output$Click_review_time<-renderText({
-    #browser()
-    click<-input$map_marker_click
-    #if(is.null(click))
-    #return(NULL)
-    #else{
-    review_time = ctb()$review_time[ctb()$id==click$id]
-    return(paste0('Time of Last Review: ', review_time))
-    #}
-  })
-  
-  #output$image<-renderUI({
-    #click<-input$map_marker_click
-    #if(is.null(click))
-      #return(NULL)
-    #else{
-      #src<-ctb()$image_url[ctb()$id==click$id]
-      #return(tags$img(src=src))
-    #}
-  #})
-  
-  observe({
-    click<-input$map_marker_click
-    output$image <- renderImage({
-            list(src = ctb()$image_url[ctb()$id==click$id],
-                 alt = "Image failed to render")
-          })
-      })
-  
-  
-  #})
-  
-  #observe({
-    #click<-input$map_marker_click
-    #review_text = paste("The most current review:",ctb()$review_text[ctb()$id==click$id])
-    #review_rating = paste("Rating of the reviewer:",ctb$review_rating[ctb$id==click$id])
-    #review_time = paste("the review time:",ctb$review_time[ctb$id==click$id])
     
-    #map$clearPopups()
-    #map$showPopup(click$lat, click$lng)
-    #output$Click_review_text<-renderText({
-      #(review_text)
-      #})
-    #output$Click_review_rating<-renderText({review_rating})
-    #output$Click_review_time<-renderText({review_time})
     
-    #output$picture <-
-      #renderText({c('< img src="',ctb()$image_url[ctb()$id==click$id],'">')})
-  #})
-  
-  
   
   #####Try to see some value
-  #output$try = renderText({
-    #print()
-  #})
+
+
   
+  
+  
+  
+  
+  output$image<-renderUI({
+    click<-input$map_marker_click
+    if(is.null(click))
+      return(NULL)
+    else{
+      src<-ctb()$image_url[ctb()$id==click$id]
+      return(tags$img(src=src))
+    }
+  })
+  
+  
+  
+
   
 }
     
