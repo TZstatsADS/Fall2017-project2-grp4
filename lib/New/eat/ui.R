@@ -10,6 +10,7 @@ library(plyr)
 library(httr)
 library(reshape2)
 library(purrr)
+library(shinycssloaders)
 
 dropdownButton <- function(label = "", status = c("default", "primary", "success", "info", "warning", "danger"), ..., width = NULL) {
   
@@ -69,7 +70,7 @@ dashboardPage(
     fluidRow(
       column(width = 12,
              box(width = NULL, solidHeader = TRUE,
-                 leafletOutput("map")))),
+                 withSpinner(leafletOutput("map"))))),
     fluidRow(box(width = 8,
                  verbatimTextOutput("Click_review_text"),
                  verbatimTextOutput("Click_review_rating"),
