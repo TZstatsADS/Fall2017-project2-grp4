@@ -20,12 +20,12 @@ shinyServer = function(input, output, session) {
     }
     
     # the end location is different than others
-    route_df$lat[steps] = route_dfa$route[[1]]$legs[[1]]$steps[[steps]]$end_location$lat
-    route_df$lon[steps] = route_dfa$route[[1]]$legs[[1]]$steps[[i]]$end_location$lng
-    route_df$address[steps] = revgeocode(c(as.numeric(route_df$lon[steps]),as.numeric(route_df$lat[steps])))
-    route_df$url[steps]=paste0("https://www.yelp.com/search?f&find_loc=",gsub('\\s',"+",  route_df$address[steps]),"&ns=1",sep="")
-    route_df$content[steps] = paste("<b><a href=","'",route_df$url[steps],"'>",route_df$address[steps],"</a></b>","<br>")
-    route_df$instruction[steps] = "Reach Destination"
+    route_df$lat[steps+1] = route_dfa$route[[1]]$legs[[1]]$steps[[steps]]$end_location$lat
+    route_df$lon[steps+1] = route_dfa$route[[1]]$legs[[1]]$steps[[i]]$end_location$lng
+    route_df$address[steps+1] = revgeocode(c(as.numeric(route_df$lon[steps]),as.numeric(route_df$lat[steps])))
+    route_df$url[steps+1]=paste0("https://www.yelp.com/search?f&find_loc=",gsub('\\s',"+",  route_df$address[steps]),"&ns=1",sep="")
+    route_df$content[steps+1] = paste("<b><a href=","'",route_df$url[steps],"'>",route_df$address[steps],"</a></b>","<br>")
+    route_df$instruction[steps+1] = "Reach Destination"
     
     trainsteps = c()
     j = 1
@@ -41,7 +41,7 @@ shinyServer = function(input, output, session) {
     for (i in trainsteps){
       route_df$instruction[i] <- paste(route_dfa$routes[[1]]$legs[[1]]$steps[[i]]$transit_details$line$short_name, route_df$instruction[i] )
     }
-    return(c(route_df,latlon))
+    return(list(route_df,latlon))
   })
  
 #########
