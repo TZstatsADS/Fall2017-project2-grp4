@@ -75,8 +75,8 @@ for (i in trainsteps){
 
 # Loading Data
 ```{r}
-stop_times <- read.csv("~/Downloads/google_transit/stop_times.txt")
-stops <- read.csv("~/Downloads/google_transit/stops.txt")
+stop_times <- read.csv("../data/stop_times.txt")
+stops <- read.csv("../data/stops.txt")
 ```
 
 #Obtain train stop information
