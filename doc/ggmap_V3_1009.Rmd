@@ -4,7 +4,7 @@ author: "Yingbin Jiang"
 date: "9/28/2017"
 output: html_document
 ---
-```{r}
+```{r, message=FALSE}
 library(ggmap)
 library(ggplot2)
 library(leaflet)
@@ -25,12 +25,12 @@ library(gepaf)
 ```{r}
 #Input Variables
 in_mile = 0.2 
-from = 'jfk,NYC, NY, USA'
+from = 'columbus circle, NYC, NY, USA'
 to = 'time square, NYC, NY, USA'
 ```
 
 #Obtain transit location information and general nearby restaurant information 
-```{r, warning=FALSE}
+```{r, warning=FALSE, message=FALSE}
 route_dfa = route(from, to, structure = 'route', mode = 'transit',output = "all")
 latlon=decodePolyline(enc_polyline =route_dfa$routes[[1]]$overview_polyline$points)
 steps = length(route_dfa$routes[[1]]$legs[[1]]$steps)

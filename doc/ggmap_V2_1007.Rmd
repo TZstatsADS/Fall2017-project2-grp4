@@ -102,11 +102,13 @@ leaflet() %>% addTiles() %>%
                                                        "Overall Rating: ", "<b>",route_df$mean_stop,"</b>"))%>%
   addCircles(lng = route_df$lon, lat = route_df$lat, weight = 1,radius =1609*in_mile)%>%
   addPolylines(lng = route_df$lon, lat = route_df$lat,color="red")%>%
-  addCircleMarkers(data = ctb,ctb$longitude, ctb$latitude, radius = ctb$rating+1, stroke = FALSE, # add 1 to make points bigger
+  addCircleMarkers(data = ctb,
+                   ctb$longitude, ctb$latitude, radius = ctb$rating+1, stroke = FALSE, # add 1 to make points bigger
                    fillOpacity = ((ctb$review_count - min(ctb$review_count)) / max(ctb$review_count - min(ctb$review_count)))+0.4,
                    color = ~{color = colorFactor(rainbow(5), ctb$price)
                    color(ctb$price)}, 
                    layerId = ctb$id,
+                   group = ctb$price,
                    popup = paste("<b><a href=", "'",ctb$url,"'>", ctb$name, "</a></b>","<br>",
                                  "Address: ",ctb$address ,"<br>",
                                  "Phone: ", "<a href=tel:", "'",ctb$display_phone,"'>", ctb$display_phone, "</a>","<br>",
