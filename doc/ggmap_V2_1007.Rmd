@@ -1,0 +1,156 @@
+---
+title: "p2-ggmap"
+author: "Yingbin Jiang"
+date: "9/28/2017"
+output: html_document
+---
+```{r, message=FALSE}
+library(ggmap)
+library(ggplot2)
+library(leaflet)
+library(htmltools)
+library(dplyr)
+library(plyr)
+library(httr)
+library(reshape2)
+library(purrr)
+library(rjson)
+library(jsonlite)
+library(geosphere)
+```
+
+
+#Set input information 
+```{r}
+#Input Variables
+in_mile = 0.2 
+from = 'Columbia University, NYC, NY'
+to = 'time square, NYC, NY, USA'
+```
+
+#Obtain transit location information and general nearby restaurant information 
+```{r, message=FALSE}
+route_df <- route(from, to, structure = 'route', mode = 'transit',output = "simple")# transit
+for (i in 1:dim(route_df)[1]){
+  route_df$address[i] = revgeocode(c(as.numeric(route_df$lon[i]),as.numeric(route_df$lat[i])))
+  route_df$url[i]=paste0("https://www.yelp.com/search?f&find_loc=",gsub('\\s',"+",  route_df$address[i]),"&ns=1",sep="")
+  route_df$content[i] = paste("<b><a href=","'",route_df$url[i],"'>",route_df$address[i],"</a></b>","<br>")
+}
+```
+
+
+#Obtain detailed restaurant information
+```{r yelp search api}
+#use yelp api we need to change it it because for some reasons spa and salesman come in. remove them out
+res = POST("https://api.yelp.com/oauth2/token",
+            body = list(grant_type = "client_credentials",
+            client_id = "s6_pZqCJcD466pU_A__Dlw",
+            client_secret = "QvjXcKZ6Ncq4yyU1nYaFDrEJjw3sFmWusd7th6U2ZmN4YWe510KtGmYsNqpAM3Tp"))
+token = content(res)$access_token
+yelp = "https://api.yelp.com"
+
+ # create an empty ctb dataframe
+ctb = data.frame(matrix(NA, nrow = 0, ncol = 13))
+
+# a for loop for 4 locations in this case 
+for (i in 1:nrow(route_df)){
+  url_i =modify_url(yelp, path = c("v3", "businesses", "search"),
+               query = list(latitude =route_df$lat[i],longitude = route_df$lon[i],
+                            open_now = T,
+                            radius =round(1609*in_mile,0)))
+  res_i = GET(url_i, add_headers('Authorization' = paste("bearer", token)))
+  #http_status(res)
+  ctb_list_i = content(res_i)$businesses
+  ctb_i=data.frame(matrix(NA, nrow = 0, ncol = 14))
+  for (j in 1:length(ctb_list_i)){ # create a J row dataframe
+    ctb_i[j,1] = ctb_list_i[[j]]$id
+    ctb_i[j,2] = ctb_list_i[[j]]$name
+    ctb_i[j,3] = ctb_list_i[[j]]$image_url
+    ctb_i[j,4] = ctb_list_i[[j]]$url
+    ctb_i[j,5] = ctb_list_i[[j]]$review_count
+    ctb_i[j,6] = ctb_list_i[[j]]$rating
+    ctb_i[j,7] = ifelse (is.null(ctb_list_i[[j]]$price),NA,ctb_list_i[[j]]$price)
+    ctb_i[j,8] = ctb_list_i[[j]]$display_phone
+    ctb_i[j,9] = ctb_list_i[[j]]$coordinates$latitude
+    ctb_i[j,10] = ctb_list_i[[j]]$coordinates$longitude
+    ctb_i[j,11] = ctb_list_i[[j]]$location$display_address[[1]]
+    ctb_i[j,12] = ctb_list_i[[j]]$location$zip_code
+    ctb_i[j,13] = ctb_list_i[[j]]$categories[[1]]$title
+    ctb_i[j,14] = i 
+  }
+  ctb=rbind(ctb, ctb_i)
+}
+
+colnames(ctb) = c("id","name","image_url","url","review_count","rating","price","display_phone","latitude","longitude","address","zip code","category","stop")
+
+ctb$price = factor(ctb$price)
+
+```
+
+
+#after searching on yelp will have the infor around the station and add more detials to rout_df dataframe
+```{r add new yelp related column to route_df}
+route_df=cbind(route_df,mean_stop =round(tapply(ctb$rating,ctb$stop,mean),2))# with 2 decimal places
+```
+
+
+#Visualization # with stops hyperlink and average rating
+```{r leaflet}
+# the key part leaflet
+leaflet() %>% addTiles() %>%
+  addMarkers(route_df$lon, route_df$lat, popup = paste(route_df$content,"<br>",
+                                                       "Overall Rating: ", "<b>",route_df$mean_stop,"</b>"))%>%
+  addCircles(lng = route_df$lon, lat = route_df$lat, weight = 1,radius =1609*in_mile)%>%
+  addPolylines(lng = route_df$lon, lat = route_df$lat,color="red")%>%
+  addCircleMarkers(data = ctb,
+                   ctb$longitude, ctb$latitude, radius = ctb$rating+1, stroke = FALSE, # add 1 to make points bigger
+                   fillOpacity = ((ctb$review_count - min(ctb$review_count)) / max(ctb$review_count - min(ctb$review_count)))+0.4,
+                   color = ~{color = colorFactor(rainbow(5), ctb$price)
+                   color(ctb$price)}, 
+                   layerId = ctb$id,
+                   group = ctb$price,
+                   popup = paste("<b><a href=", "'",ctb$url,"'>", ctb$name, "</a></b>","<br>",
+                                 "Address: ",ctb$address ,"<br>",
+                                 "Phone: ", "<a href=tel:", "'",ctb$display_phone,"'>", ctb$display_phone, "</a>","<br>",
+                                 "Rating: ", ctb$rating, "<br>"
+                               ))%>%
+  addLegend(pal = colorFactor(rainbow(5), ctb$price), values = ctb$price,
+      title = "Price Range",
+      opacity = 1
+    )
+```
+
+
+```{r review and rate} 
+for (i in 1:dim(ctb)[1]){
+  url_rev_i = paste0("https://api.yelp.com/v3/businesses/",ctb$id[i],"/reviews")
+  res_rev_i=GET(url_rev_i, add_headers('Authorization' = paste("bearer", token)))
+  ctb$review_time[i] = content(res_rev_i)$review[[1]]$time_created # for review created time need to change
+  ctb$review_rating[i] = content(res_rev_i)$review[[1]]$rating
+  ctb$review_text[i] = content(res_rev_i)$review[[1]]$text
+}
+```
+
+
+
+```{r}
+#critical part for google map useless code now
+df2=route(from, to, structure = 'route', mode = 'transit',output = "all")
+df2$routes[[1]]$legs[[1]]$steps[[1]]$html_instructions
+df2$routes[[1]]$legs[[1]]$steps[[3]]$steps[[3]]$html_instructions
+df2$routes[[1]]$legs[[1]]$steps[[3]]$steps[[1]]$travel_mode
+df2$routes[[1]]$legs[[1]]$steps[[3]]$html_instructions
+df2$routes[[1]]$legs[[1]]$steps[[1]]$html_instructions
+
+df2$routes[[1]]$legs[[1]]$steps[[1]]$steps[[4]]$end_location$lat
+  
+route_df
+
+df2$routes[[1]]$legs[[1]]$steps[[2]]$html_instructions
+df2$routes[[1]]$legs[[1]]$steps[[3]]$html_instructions
+
+ctb$url
+```
+
+
+
