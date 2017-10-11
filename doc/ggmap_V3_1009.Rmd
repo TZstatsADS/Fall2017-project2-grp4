@@ -29,12 +29,12 @@ library(stringr)
 #Input Variables
 in_mile = 0.2 
 from = 'Chinatown, New York'
-to = 'East Harlem, New York'
+to = 'Bedford Av Station, Brooklyn'
+route_dfa = route(from, to, structure = 'route', mode = 'transit',output = "all")
 ```
 
 #Obtain transit location information and general nearby restaurant information 
 ```{r, warning=FALSE, message=FALSE}
-route_dfa = route(from, to, structure = 'route', mode = 'transit',output = "all")
 latlon=decodePolyline(enc_polyline =route_dfa$routes[[1]]$overview_polyline$points)
 steps = length(route_dfa$routes[[1]]$legs[[1]]$steps)
 route_df = data.frame(matrix(nrow = (steps+1))) # define a new matrix and this matrix will replace route_df
@@ -44,7 +44,7 @@ for (i in 1:steps){
   route_df$lat[i] = route_dfa$route[[1]]$legs[[1]]$steps[[i]]$start_location$lat
   route_df$lon[i] = route_dfa$route[[1]]$legs[[1]]$steps[[i]]$start_location$lng
   route_df$address[i] = revgeocode(c(as.numeric(route_df$lon[i]),as.numeric(route_df$lat[i])))
-  route_df$url[i]=paste0("https://www.yelp.com/search?f&find_loc=",gsub('\\s',"+",  route_df$address[i]),"&ns=1",sep="")
+  route_df$url[i]=paste0("https://www.yelp.com/search?find_desc=Food&l=a:", route_df$lat[i],",", route_df$lon[i],",", "45")
   route_df$content[i] = paste("<b><a href=","'",route_df$url[i],"'>",route_df$address[i],"</a></b>","<br>")
   route_df$instruction[i] = route_dfa$route[[1]]$legs[[1]]$steps[[i]]$html_instructions
 }
@@ -53,7 +53,7 @@ for (i in 1:steps){
 route_df$lat[steps+1] = route_dfa$route[[1]]$legs[[1]]$steps[[steps]]$end_location$lat
 route_df$lon[steps+1] = route_dfa$route[[1]]$legs[[1]]$steps[[i]]$end_location$lng
 route_df$address[steps+1] = revgeocode(c(as.numeric(route_df$lon[steps]),as.numeric(route_df$lat[steps])))
-route_df$url[steps+1]=paste0("https://www.yelp.com/search?f&find_loc=",gsub('\\s',"+",  route_df$address[steps]),"&ns=1",sep="")
+route_df$url[steps+1]=paste0("https://www.yelp.com/search?find_desc=Food&l=a:", route_df$lat[steps+1],",", route_df$lon[steps+1],",", "45")
 route_df$content[steps+1] = paste("<b><a href=","'",route_df$url[steps],"'>",route_df$address[steps],"</a></b>","<br>")
 route_df$instruction[steps+1] = "Reach Destination"
 
@@ -150,9 +150,10 @@ names(subway_df) <- names(route_df)
 for (i in 1:nrow(subway_res)){
   subway_df$lat[i] = subway_res$stop_lat[i]
   subway_df$lon[i] = subway_res$stop_lon[i]
-  subway_df$address[i] = revgeocode(c(as.numeric(subway_df$lon[i]),as.numeric(subway_df$lat[i])))
-  subway_df$url[i]=paste0("https://www.yelp.com/search?f&find_loc=",gsub('\\s',"+",  subway_df$address[i]),"&ns=1",sep="")
-  subway_df$content[i] = paste("<b><a href=","'",route_df$url[i],"'>",subway_df$address[i],"</a></b>","<br>")
+  subway_df$address[i] = paste(subway_res$stop_name[i])
+  subway_df$url[i]=paste0("https://www.yelp.com/search?find_desc=Food&l=a:", subway_df$lat[i],",", subway_df$lon[i],",", "45")
+  #subway_df$url[i]=paste0("https://www.yelp.com/search?f&find_loc=",gsub('\\s',"+",  subway_df$address[i]),"&ns=1",sep="")
+  subway_df$content[i] = paste("<b><a href=","'",subway_df$url[i],"'>",subway_df$address[i],"</a></b>","<br>")
   subway_df$instruction[i] = paste("Subway on", subway_res$line[i], "line, in", subway_res$direction[i], "direction.")
 }
 ```
@@ -184,8 +185,8 @@ route_df <- fin_df
 ```{r yelp search api}
 res = POST("https://api.yelp.com/oauth2/token",
             body = list(grant_type = "client_credentials",
-            client_id = "KjjqVxt9pcpH6fWmEqVvEQ",
-            client_secret = "ApFCYwJTIteL7mu146tmmLMuCui7unn2dcKN3ScFTrSLRLm8QWKNqkTWXtHz4OY1"))
+            client_id = "PN60TBfs2Dim2NyaDtFJcQ",
+            client_secret = "gg5V6LvkqMcpuVWNMgnzpEajbedo3yxzWi4VeEZE2y7Pt7hqtzJsCts9srUpupf6"))
 token = content(res)$access_token
 yelp = "https://api.yelp.com"
 
