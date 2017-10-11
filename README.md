@@ -1,4 +1,4 @@
-# Project 2: Open Data App - an RShiny app development project
+# Project 2: Plan.R - Trip Planner
 
 ### [Project Description](doc/project2_desc.md)
 
@@ -18,8 +18,8 @@ The **learning goals** for this project is:
 
 Term: Fall 2017
 
-+ Team #
-+ **Projec title**: + Team members
++ Team 4
++ **Project title**: + Team members
 	+ Chaoyue Tan
 	+ Fan Gong
 	+ Jordan Leung
