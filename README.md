@@ -14,7 +14,8 @@ The **learning goals** for this project is:
 - systems development/design life cycle
 - shiny app/shiny server
 
-## Project Title Lorem ipsum dolor sit amet
+## Project Title: Plan.R - Trip Planner
+
 Term: Fall 2017
 
 + Team #
