@@ -1,82 +1,123 @@
 #using 'shinydashboard' library
 
-#FOR OUR GROUP
+packages.used <- c("shinydashboard", "ggmap", "ggplot2", "leaflet", 
+                   "htmltools", "dplyr", "plyr", "httr", 
+                   "reshape2", "purrr",
+                   "shinycssloaders", "gepaf", 
+                   "stringr", "geosphere")
 
-#dbHeader<-dashboardHeader(title='Restaurants on your way', titleWidth = 350)
+#check packages that need to be installed
+
+packages.needed=setdiff(packages.used, 
+                        intersect(installed.packages()[,1], 
+                                  packages.used))
+
+#install additional packages
+
+if(length(packages.needed)>0){
+  install.packages(packages.needed, dependencies = TRUE)
+}
+
+library(shinydashboard)
+library(ggmap)
+library(ggplot2)
+library(leaflet)
+library(htmltools)
+library(dplyr)
+library(plyr)
+library(httr)
+library(reshape2)
+library(purrr)
+library(shinycssloaders)
+library(gepaf)
+library(stringr)
+library(geosphere)
+
+dropdownButton <- function(label = "", status = c("default", "primary", "success", "info", "warning", "danger"), ..., width = NULL) {
+  
+  status <- match.arg(status)
+  # dropdown button content
+  html_ul <- list(
+    class = "dropdown-menu",
+    style = if (!is.null(width)) 
+      paste0("width: ", validateCssUnit(width), ";"),
+    lapply(X = list(...), FUN = tags$li, style = "margin-left: 10px; margin-right: 10px;")
+  )
+  # dropdown button apparence
+  html_button <- list(
+    class = paste0("btn btn-", status," dropdown-toggle"),
+    type = "button", 
+    `data-toggle` = "dropdown"
+  )
+  html_button <- c(html_button, list(label))
+  html_button <- c(html_button, list(tags$span(class = "caret")))
+  # final result
+  tags$div(
+    class = "dropdown",
+    do.call(tags$button, html_button),
+    do.call(tags$ul, html_ul),
+    tags$script(
+      "$('.dropdown-menu').click(function(e) {
+      e.stopPropagation();
+});")
+  )
+}
+
 
 dashboardPage(
-
-    skin = "purple",
+  skin = "black",
+  dashboardHeader(
+    title = 'Interesting Places on Your Way',
+    titleWidth = 310
+  ),
   
-    dashboardHeader(
-      title = 'Restaurants on your way',
-      titleWidth = 310
-      ),
-
   dashboardSidebar(
     width = 310,
-    sidebarMenu(id='sidebarmenu', #bookmark
-    #sidebarMenu(id='sidebar',
-                #menuItem("Cuisine Overview",tabName="overview",icon=icon("pie-chart")),
-                menuItem("Restaurants",tabName="locator",icon=icon("cutlery")),
-                menuItem("github", href = "https://github.com/rstudio/shinydashboard/", 
-                         icon = icon("file-code-o")) # to be add a url
-                         
-    ),
-    
-    textInput("startingPoint","Enter starting point:",'Time Square,NYC, NY, USA'),
-    textInput("destination","Enter destination:",'Columbia University, NYC, NY, USA'),
-    sliderInput("distance","Max dist from your route (mi)",
-                min = 1, max = 21, value = 1),
-    
-    selectInput("cuisine","Cuisine:",levels(uniqueRestau5$Cuisine),'Ice Cream',multiple=T),
-    sliderInput("minReview","Minimum # of reviews on Yelp",min = 1, max = 100, value = 1),
-    sliderInput("minStar","Minimum # of stars on Yelp",min = 1, max = 5, value = 1),
-    sliderInput("minSafetyScore","Minimum safety score",min = 0, max = 1, value = 0),
-    submitButton("Submit",width='100%')
-   
-    
-    ),
-              
+    textInput("from","Enter starting point:",'Times Square, New York'),
+    textInput("to","Enter destination:",'Columbia University, New York'),
+    numericInput("in_mile","Max dist from your route (mi)",0.2, min = 0.1, max = 5),
+    sliderInput("minStar","Minimum # of stars on Yelp",min = 1, max = 5, value = 1, step = 0.5),
+    sliderInput("maxPrice","Price Range",min = 1, max = 4, value = 4, step = 1),
+    div(style="display:inline-block;width:80%;text-align: center;",
+        submitButton("Submit / Refresh"))
+    #fluidRow(
+    #  column(width = 6,
+    #    dropdownButton(label = "Select Cuisines", status = "default", width = 80,
+    #      checkboxGroupInput(inputId = "check", label = "Choose", choices = 1:20)
+    #    ),
+    #    verbatimTextOutput(outputId = "cuisine")))
+  ),
+  
   dashboardBody(
-    includeCSS('./www/custom.css'),
-    tabItems(
-      
-      tabItem(tabName = "overview",
-              fluidRow(
-                column(width=12,
-                       box(width=NULL,
-                           title=tagList(shiny::icon("pie-chart"),"Cuisine distribution at your location"),
-                           status='primary',
-                           collapsible=T,
-                           showOutput("pieChart","highcharts") # TO BE DEBUGGED
-                       )))),
-      
-      tabItem(tabName='locator',
-              fluidRow(
-                column(width = 7,
-                       box(width = NULL, solidHeader = TRUE,
-                           leafletOutput("Map"))),
-                column(width=5,
-                       box(title = "Selected Restaurant", status = "primary",
-                           width=NULL,solidHeader=T,
-                           textOutput("clickedName"),
-                           br(),
-                           uiOutput('image'),
-                           br(),
-                           textOutput("clickedNameAddress"),
-                           textOutput("clickedNameGrade"),
-                           textOutput("clickedNameCritical"),
-                           textOutput("clickedNameRating"),
-                           textOutput("clickedNameReviewCount"),
-                           textOutput("clickedNamePriceRange"),
-                           textOutput("clickedNamePhone")))),
-              fluidRow(column(width=5,
-                              selectInput("nameId","Restaurant Id",c("",sort(uniqueRestau5$NameId)),
-                                          selected="",multiple=F,width="100%")))
-              )
-      )
-
+    includeCSS('./www/bootstrap.min.css'),
+    tags$head(tags$style(HTML('
+      .main-header .logo {
+                              
+                              font-family: Menlo, Monaco, Consolas, "Courier New", monospace;
+                              
+                              font-weight: bold;
+                              font-size: 16px;
+                              }
+                              '))),
+    fluidRow(
+      column(width = 12,
+             box(width = NULL, solidHeader = TRUE,
+                 withSpinner(leafletOutput("map"))))),
+    fluidRow(box(width = 8,
+                 htmlOutput("Click_review_text"),
+                 htmlOutput("Click_review_rating"),
+                 htmlOutput("Click_review_time")), box(width = 4, uiOutput("image")))
   )
 )
+
+
+
+
+
+
+
+
+
+
+
 
