@@ -12,6 +12,8 @@ library(reshape2)
 library(purrr)
 library(shinycssloaders)
 library(gepaf)
+library(stringr)
+library(geosphere)
 
 dropdownButton <- function(label = "", status = c("default", "primary", "success", "info", "warning", "danger"), ..., width = NULL) {
   
