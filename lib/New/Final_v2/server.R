@@ -273,9 +273,9 @@ shinyServer = function(input, output, session) {
     })
   })
   
-  output$Overview = renderText({
-    paste("<b>","The purpose of this project is ...")
-  })
+  #output$Overview = renderText({
+    #paste("<b>","The purpose of this project is ...")
+  #})
   
   output$mytable <- renderDataTable({
     unique(ctb()[,c(2,5,6,7,8,11,13)] %>% filter(rating >= input$minStar & as.numeric(ctb()$price) <= input$maxPrice))

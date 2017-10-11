@@ -32,6 +32,7 @@ library(stringr)
 library(geosphere)
 library(shinyjs)
 library(DT)
+library(markdown)
 
 
 dashboardPage(
@@ -89,7 +90,8 @@ dashboardPage(
               fluidRow(
                 column(width=12,
                        collapsible=T,
-                       htmlOutput("Overview")
+                       #htmlOutput("Overview")
+                       includeMarkdown("overview.md")
                 )
               )
       )
