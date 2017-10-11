@@ -4,7 +4,7 @@
 
 ![screenshot](doc/screenshot2.png)
 
-In this second project of GU4243/GR5243 Applied Data Science, we develop an *Exploratory Data Analysis and Visualization* shiny app on a topic of your choice using U.S. government open data released on the [data.gov](https://data.gov/) website. See [Project 2 Description](doc/project2_desc.md) for more details.  
+In this second project of GU4243/GR5243 Applied Data Science, we develop an *Exploratory Data Analysis and Visualization* shiny app using Google Maps, Yelp, and New York MTA data. See [Project 2 Description](fig/map_pic1.md) for more details. 
 
 The **learning goals** for this project is:
 
@@ -14,20 +14,18 @@ The **learning goals** for this project is:
 - systems development/design life cycle
 - shiny app/shiny server
 
-*The above general statement about project 2 can be removed once you are finished with your project. It is optional.
-
 ## Project Title Lorem ipsum dolor sit amet
 Term: Fall 2017
 
 + Team #
 + **Projec title**: + Team members
-	+ team member 1
-	+ team member 2
-	+ team member 3
-	+ team member 4
-	+ team member 5
+	+ Chaoyue Tan
+	+ Fan Gong
+	+ Jordan Leung
+	+ Xinhu Wang
+	+ Yingbin Jiang
 
-+ **Project summary**: Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
++ **Project summary**: Plan.R is an interactive, real time Shiny app which plans a route using Google Maps and finds highly rated businesses from Yelp that are along the route.
 
 + **Contribution statement**: ([default](doc/a_note_on_contributions.md)) All team members contributed equally in all stages of this project. All team members approve our work presented in this GitHub repository including this contributions statement. 
 
