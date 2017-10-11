@@ -152,7 +152,6 @@ for (i in 1:nrow(subway_res)){
   subway_df$lon[i] = subway_res$stop_lon[i]
   subway_df$address[i] = paste(subway_res$stop_name[i])
   subway_df$url[i]=paste0("https://www.yelp.com/search?find_desc=Food&l=a:", subway_df$lat[i],",", subway_df$lon[i],",", "45")
-  #subway_df$url[i]=paste0("https://www.yelp.com/search?f&find_loc=",gsub('\\s',"+",  subway_df$address[i]),"&ns=1",sep="")
   subway_df$content[i] = paste("<b><a href=","'",subway_df$url[i],"'>",subway_df$address[i],"</a></b>","<br>")
   subway_df$instruction[i] = paste("Subway on", subway_res$line[i], "line, in", subway_res$direction[i], "direction.")
 }
