@@ -4,6 +4,8 @@
 
 ![screenshot](fig/map_pic1.png)
 
+ShinyApp Link: https://gongfan.shinyapps.io/planr/
+
 In this second project of GU4243/GR5243 Applied Data Science, we develop an *Exploratory Data Analysis and Visualization* shiny app using Google Maps, Yelp, and New York MTA data.
 
 The **learning goals** for this project is:
