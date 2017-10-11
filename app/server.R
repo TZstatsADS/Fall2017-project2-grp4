@@ -45,8 +45,8 @@ shinyServer = function(input, output, session) {
     
     ## Jordan's part... might make it too slow... not sure.
     
-    stop_times <- read.csv("../data/stop_times.txt")
-    stops <- read.csv("../data/stops.txt")
+    stop_times <- read.csv("stop_times.txt")
+    stops <- read.csv("stops.txt")
     
     stopdf = join(stop_times[,c(1,3,4,5)], stops[,c(1,3,5,6)], by='stop_id')
     
@@ -218,7 +218,7 @@ shinyServer = function(input, output, session) {
   output$map = renderLeaflet({
     leaflet() %>% addTiles() %>%
       addProviderTiles(providers$Stamen.Terrain) %>%
-      addMarkers(icon = iconList(freq = makeIcon("../fig/subway_icon.png", iconWidth = 20, iconHeight = 20)), 
+      addMarkers(icon = iconList(freq = makeIcon("subway_icon.png", iconWidth = 20, iconHeight = 20)), 
                  route_df2()$lon, route_df2()$lat, popup = paste(route_df2()$content,"<br>","Overall Rating: ", "<b>",route_df2()$mean_stop,"</b>"))%>%
       addCircles(lng = route_df()[[1]]$lon, lat = route_df()[[1]]$lat, weight = 1,radius =1609* input$in_mile)%>%
       addPolylines(lng = route_df()[[2]]$lon, lat = route_df()[[2]]$lat,color="black")%>%
@@ -273,6 +273,7 @@ shinyServer = function(input, output, session) {
   output$mytable <- renderDataTable({
     unique(ctb()[,c(2,5,6,7,8,11,13)] %>% filter(rating >= input$minStar & as.numeric(ctb()$price) <= input$maxPrice))
   })
+  
   
 }
 
