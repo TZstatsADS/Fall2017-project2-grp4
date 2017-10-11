@@ -1,6 +1,6 @@
 # Project 2: Plan.R - Trip Planner
 
-### [Project Description](doc/project2_desc.md)
+### [Project Description]
 
 ![screenshot](fig/map_pic1.png)
 
