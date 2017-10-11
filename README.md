@@ -1,8 +1,8 @@
-# Project 2: Open Data App - an RShiny app development project
+# Project 2: Plan.R - Trip Planner
 
-### [Project Description](doc/project2_desc.md)
+### Project Description
 
-![screenshot](fig/map_pic1.md)
+![screenshot](fig/map_pic1.png)
 
 In this second project of GU4243/GR5243 Applied Data Science, we develop an *Exploratory Data Analysis and Visualization* shiny app using Google Maps, Yelp, and New York MTA data.
 
@@ -18,8 +18,8 @@ The **learning goals** for this project is:
 
 Term: Fall 2017
 
-+ Team #
-+ **Projec title**: + Team members
++ Team 4
++ **Project title**: + Team members
 	+ Chaoyue Tan
 	+ Fan Gong
 	+ Jordan Leung
