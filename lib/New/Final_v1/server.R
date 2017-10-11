@@ -117,7 +117,7 @@ shinyServer = function(input, output, session) {
       subway_df$lat[i] = subway_res$stop_lat[i]
       subway_df$lon[i] = subway_res$stop_lon[i]
       subway_df$address[i] = revgeocode(c(as.numeric(subway_df$lon[i]),as.numeric(subway_df$lat[i])))
-      subway_df$url[i]=paste0("https://www.yelp.com/search?f&find_loc=",gsub('\\s',"+",  subway_df$address[i]),"&ns=1",sep="")
+      subway_df$url[i]=paste0("https://www.yelp.com/search?find_desc=Food&l=a:", subway_df$lat[i],",", subway_df$lon[i],",", "45")
       subway_df$content[i] = paste("<b><a href=","'",route_df$url[i],"'>",subway_df$address[i],"</a></b>","<br>")
       subway_df$instruction[i] = paste("Subway on", subway_res$line[i], "line, in", subway_res$direction[i], "direction.")
     }
@@ -140,6 +140,7 @@ shinyServer = function(input, output, session) {
     }
     
     route_df <- fin_df
+    route_df <- route_df[!is.na(route_df$address),]
     
     ## end jordan's part
     return(list(route_df,latlon))
@@ -154,8 +155,8 @@ shinyServer = function(input, output, session) {
   ctb <- reactive({
     res = POST("https://api.yelp.com/oauth2/token",
                body = list(grant_type = "client_credentials",
-                           client_id = "KjjqVxt9pcpH6fWmEqVvEQ",
-                           client_secret = "ApFCYwJTIteL7mu146tmmLMuCui7unn2dcKN3ScFTrSLRLm8QWKNqkTWXtHz4OY1"))
+                           client_id = "s6_pZqCJcD466pU_A__Dlw",
+                           client_secret = "QvjXcKZ6Ncq4yyU1nYaFDrEJjw3sFmWusd7th6U2ZmN4YWe510KtGmYsNqpAM3Tp"))
     token = content(res)$access_token
     yelp = "https://api.yelp.com"
     
@@ -220,12 +221,11 @@ shinyServer = function(input, output, session) {
   
   #####Create map
   
-  #data_of_click <- reactiveValues(clickedMarker=NULL)
     
   output$map = renderLeaflet({
      leaflet() %>% addTiles() %>%
-      addMarkers(route_df2()$lon, route_df2()$lat, popup = paste(route_df2()$content,"<br>",
-                                                                 "Overall Rating: ", "<b>",route_df2()$mean_stop,"</b>"))%>%
+      addMarkers(icon = iconList(freq = makeIcon("../../../data/a.png", iconWidth = 20, iconHeight = 20)), 
+                 route_df2()$lon, route_df2()$lat, popup = paste(route_df2()$content,"<br>","Overall Rating: ", "<b>",route_df2()$mean_stop,"</b>"))%>%
       addCircles(lng = route_df()[[1]]$lon, lat = route_df()[[1]]$lat, weight = 1,radius =1609* input$in_mile)%>%
       addPolylines(lng = route_df()[[2]]$lon, lat = route_df()[[2]]$lat,color="red")%>%
       
@@ -239,7 +239,8 @@ shinyServer = function(input, output, session) {
                        popup = paste("<b><a href=", "'",{ctb() %>% filter(rating >= input$minStar & as.numeric(ctb()$price) <= input$maxPrice)}$url,"'>", {ctb() %>% filter(rating >= input$minStar & as.numeric(ctb()$price) <= input$maxPrice)}$name, "</a></b>","<br>",
                                      "Address: ",{ctb() %>% filter(rating >= input$minStar & as.numeric(ctb()$price) <= input$maxPrice)}$address ,"<br>",
                                      "Phone: ", "<a href=tel:", "'",{ctb() %>% filter(rating >= input$minStar & as.numeric(ctb()$price) <= input$maxPrice)}$display_phone,"'>", {ctb() %>% filter(rating >= input$minStar & as.numeric(ctb()$price) <= input$maxPrice)}$display_phone, "</a>","<br>",
-                                     "Rating: ", {ctb() %>% filter(rating >= input$minStar & as.numeric(ctb()$price) <= input$maxPrice)}$rating, "<br>"
+                                     "Rating: ", {ctb() %>% filter(rating >= input$minStar & as.numeric(ctb()$price) <= input$maxPrice)}$rating, "<br>",
+                                     "Category :", {ctb() %>% filter(rating >= input$minStar & as.numeric(ctb()$price) <= input$maxPrice)}$category, "<br>"
                       ))%>%
       addLegend(pal = colorFactor(rainbow(5), ctb()$price), values = {ctb() %>% filter(rating >= input$minStar & as.numeric(ctb()$price) <= input$maxPrice)}$price,
                 title = "Price Range",
@@ -248,15 +249,16 @@ shinyServer = function(input, output, session) {
   })
   
   
+  output$transit_information = renderText(c(paste('<span style="color:#5F5DA3"> The transit information: </span>'),paste("<br><b>", 'step ', 1:length(unique(route_df()[[1]]$instruction)), ": ", unique(route_df()[[1]]$instruction), "</b>")))
 
   
   observe({
     click = input$map_marker_click
     if(is.null(click))
       return()
-    review_text = paste('<span style="color:#5F5DA3"> The most current review: </span><br>',"<b>",ctb()$review_text[ctb()$id==click$id],"</b>")
-    review_rating = paste('<span style="color:#5F5DA3"> Rating of this Reviewer: </span><br>',"<b>",ctb()$review_rating[ctb()$id==click$id],"</b>")
-    review_time = paste('<span style="color:#5F5DA3"> The Rating Time: </span><br>',"<b>",ctb()$review_time[ctb()$id==click$id],"</b>")
+    review_text = c(paste('<span style="color:#5F5DA3"> The most current review: </span>', paste("<br><b>",ctb()$review_text[ctb()$id==click$id],"</b>")))
+    review_rating = c(paste('<span style="color:#5F5DA3"> Rating of this Reviewer: </span>') ,paste("<br><b>",ctb()$review_rating[ctb()$id==click$id],"</b>"))
+    review_time = c(paste('<span style="color:#5F5DA3"> The Rating Time: </span>'), paste("<br><b>",ctb()$review_time[ctb()$id==click$id],"</b>"))
     
 
     output$Click_review_text<-renderText({review_text})

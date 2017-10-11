@@ -124,7 +124,7 @@ shinyServer = function(input, output, session) {
   output$map = renderLeaflet({
      leaflet() %>% addTiles() %>%
       addMarkers(route_df2()$lon, route_df2()$lat, popup = paste(route_df2()$content,"<br>",
-                                                                 "Overall Rating: ", "<b>",route_df2()$mean_stop,"</b>"))%>%
+                                                                 "Overall Rating: ", "<b>", route_df2()$mean_stop,"</b>"))%>%
       addCircles(lng = route_df()[[1]]$lon, lat = route_df()[[1]]$lat, weight = 1,radius =1609* input$in_mile)%>%
       addPolylines(lng = route_df()[[2]]$lon, lat = route_df()[[2]]$lat,color="red")%>%
       addCircleMarkers(data = {ctb() %>% filter(rating >= input$minStar & as.numeric(ctb()$price) <= input$maxPrice)},

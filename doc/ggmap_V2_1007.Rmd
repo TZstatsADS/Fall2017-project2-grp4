@@ -44,8 +44,8 @@ for (i in 1:dim(route_df)[1]){
 #use yelp api we need to change it it because for some reasons spa and salesman come in. remove them out
 res = POST("https://api.yelp.com/oauth2/token",
             body = list(grant_type = "client_credentials",
-            client_id = "KjjqVxt9pcpH6fWmEqVvEQ",
-            client_secret = "ApFCYwJTIteL7mu146tmmLMuCui7unn2dcKN3ScFTrSLRLm8QWKNqkTWXtHz4OY1"))
+            client_id = "s6_pZqCJcD466pU_A__Dlw",
+            client_secret = "QvjXcKZ6Ncq4yyU1nYaFDrEJjw3sFmWusd7th6U2ZmN4YWe510KtGmYsNqpAM3Tp"))
 token = content(res)$access_token
 yelp = "https://api.yelp.com"
 
