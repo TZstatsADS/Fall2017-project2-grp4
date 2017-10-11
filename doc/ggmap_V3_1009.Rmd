@@ -178,6 +178,8 @@ for (i in 1:nrow(route_df)){
 }
 
 route_df <- fin_df
+
+route_df <- route_df[!is.na(route_df$address),]
 ```
 
 #Obtain detailed restaurant information
