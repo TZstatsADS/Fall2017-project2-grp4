@@ -5,7 +5,7 @@
 
 Plan.R is an interactive, real time Shiny app which plans a route using Google Maps and finds highly rated businesses from Yelp that are along the route.
 
-###Instructions for First Time Users
+### Instructions for First Time Users
 
 First you enter two locations. It could be any two places in New York City.
 
@@ -19,9 +19,9 @@ When you click on station symbol, it displays the address of the train station a
 
 When you click on a business circle, it shows all the information you may need: store location, phone number, food type, and rating.
 
-Also try to click on the hyperlink and direct you to the business’s yelp page.
+Also try to click on the hyperlink and direct you to the business's yelp page.
 
-###Group member information: 
+### Group member information: 
 
  + Chaoyue Tan
  + Fan Gong
@@ -31,5 +31,5 @@ Also try to click on the hyperlink and direct you to the business’s yelp page.
 
 
 
-**Please Enjoy!**
+### **Please Enjoy!**
  

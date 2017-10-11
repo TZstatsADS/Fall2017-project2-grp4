@@ -149,15 +149,12 @@ shinyServer = function(input, output, session) {
   
   
   
-  
-  
-  
   #####Create ctb dataframe that contains all the restaurant information 
   ctb <- reactive({
     res = POST("https://api.yelp.com/oauth2/token",
                body = list(grant_type = "client_credentials",
-                           client_id = "s6_pZqCJcD466pU_A__Dlw",
-                           client_secret = "QvjXcKZ6Ncq4yyU1nYaFDrEJjw3sFmWusd7th6U2ZmN4YWe510KtGmYsNqpAM3Tp"))
+                           client_id = "gdDu1w1yur2tLZB_A-EugA",
+                           client_secret = "zTbzHkkmZ2eiCMmAZZFmD7CAd4zOKX8CVREfBQlteCkKdUJiAJMknfDgpsiBAJP8"))
     token = content(res)$access_token
     yelp = "https://api.yelp.com"
     

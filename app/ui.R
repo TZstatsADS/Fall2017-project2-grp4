@@ -2,7 +2,7 @@ packages.used <- c("shinydashboard", "ggmap", "ggplot2", "leaflet",
                    "htmltools", "dplyr", "plyr", "httr", 
                    "reshape2", "purrr",
                    "shinycssloaders", "gepaf", 
-                   "stringr", "geosphere", "DT", "shinyjs", "markdown")
+                   "stringr", "geosphere", "DT", "shinyjs", "markdown", "rsconnect")
 
 #check packages that need to be installed
 
@@ -33,13 +33,14 @@ library(geosphere)
 library(shinyjs)
 library(DT)
 library(markdown)
+library(rsconnect)
 
 
 dashboardPage(
   
   skin = "purple",
   dashboardHeader(
-    title = 'Plan.R',
+    title = 'Plan.R - Trip Planner',
     titleWidth = 310
   ),
   
