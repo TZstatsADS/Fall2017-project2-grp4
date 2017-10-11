@@ -2,7 +2,7 @@
 
 ### [Project Description](doc/project2_desc.md)
 
-![screenshot](fig/map_pic1.md)
+![screenshot](fig/map_pic1.png)
 
 In this second project of GU4243/GR5243 Applied Data Science, we develop an *Exploratory Data Analysis and Visualization* shiny app using Google Maps, Yelp, and New York MTA data.
 
