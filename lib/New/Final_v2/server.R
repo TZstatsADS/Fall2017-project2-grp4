@@ -1,8 +1,9 @@
+
 #FOR OUR GROUP
 
 shinyServer = function(input, output, session) {
   
-########## route_df new 
+  ########## route_df new 
   route_df = reactive({
     route_dfa = route(input$from, input$to, structure = 'route', mode = 'transit',output = "all")
     latlon=decodePolyline(enc_polyline =route_dfa$routes[[1]]$overview_polyline$points)
@@ -145,8 +146,8 @@ shinyServer = function(input, output, session) {
     ## end jordan's part
     return(list(route_df,latlon))
   })
- 
-
+  
+  
   
   
   
@@ -208,11 +209,6 @@ shinyServer = function(input, output, session) {
     return(ctb)
   })
   
-  #####Create Palette Variable
-  #color = function(){
-   # return(colorFactor("RdYlBu", ctb()$price))
-  #}
-  
   #####Create a complete route dataframe
   route_df2 = reactive({
     return(cbind(route_df()[[1]],mean_stop =round(tapply(ctb()$rating,ctb()$stop,mean),2)))
@@ -221,14 +217,14 @@ shinyServer = function(input, output, session) {
   
   #####Create map
   
-    
+  
   output$map = renderLeaflet({
-     leaflet() %>% addTiles() %>%
-      addProviderTiles(providers$Stamen.Watercolor) %>%
+    leaflet() %>% addTiles() %>%
+      addProviderTiles(providers$Stamen.Terrain) %>%
       addMarkers(icon = iconList(freq = makeIcon("../../../data/a.png", iconWidth = 20, iconHeight = 20)), 
                  route_df2()$lon, route_df2()$lat, popup = paste(route_df2()$content,"<br>","Overall Rating: ", "<b>",route_df2()$mean_stop,"</b>"))%>%
       addCircles(lng = route_df()[[1]]$lon, lat = route_df()[[1]]$lat, weight = 1,radius =1609* input$in_mile)%>%
-      addPolylines(lng = route_df()[[2]]$lon, lat = route_df()[[2]]$lat,color="red")%>%
+      addPolylines(lng = route_df()[[2]]$lon, lat = route_df()[[2]]$lat,color="black")%>%
       
       
       addCircleMarkers(data = {ctb() %>% filter(rating >= input$minStar & as.numeric(ctb()$price) <= input$maxPrice)},
@@ -242,7 +238,7 @@ shinyServer = function(input, output, session) {
                                      "Phone: ", "<a href=tel:", "'",{ctb() %>% filter(rating >= input$minStar & as.numeric(ctb()$price) <= input$maxPrice)}$display_phone,"'>", {ctb() %>% filter(rating >= input$minStar & as.numeric(ctb()$price) <= input$maxPrice)}$display_phone, "</a>","<br>",
                                      "Rating: ", {ctb() %>% filter(rating >= input$minStar & as.numeric(ctb()$price) <= input$maxPrice)}$rating, "<br>",
                                      "Category :", {ctb() %>% filter(rating >= input$minStar & as.numeric(ctb()$price) <= input$maxPrice)}$category, "<br>"
-                      ))%>%
+                       ))%>%
       addLegend(pal = colorFactor("RdYlBu", ctb()$price), values = {ctb() %>% filter(rating >= input$minStar & as.numeric(ctb()$price) <= input$maxPrice)}$price,
                 title = "Price Range",
                 opacity = 1
@@ -250,18 +246,18 @@ shinyServer = function(input, output, session) {
   })
   
   
-  output$transit_information = renderText(c(paste('<span style="color:#5F5DA3"> The transit information: </span>'),paste("<br><b>", 'step ', 1:length(unique(route_df()[[1]]$instruction)), ": ", unique(route_df()[[1]]$instruction), "</b>")))
-
+  output$transit_information = renderText(c(paste('<span style="color:#5F5DA3"> The Transit Information: </span>'),paste("<br><b>", 'step ', 1:length(unique(route_df()[[1]]$instruction)), ": ", unique(route_df()[[1]]$instruction), "</b>")))
+  
   
   observe({
     click = input$map_marker_click
     if(is.null(click))
       return()
-    review_text = c(paste('<span style="color:#5F5DA3"> The most current review: </span>', paste("<br><b>",ctb()$review_text[ctb()$id==click$id],"</b>")))
-    review_rating = c(paste('<span style="color:#5F5DA3"> Rating of this Reviewer: </span>') ,paste("<br><b>",ctb()$review_rating[ctb()$id==click$id],"</b>"))
-    review_time = c(paste('<span style="color:#5F5DA3"> The Rating Time: </span>'), paste("<br><b>",ctb()$review_time[ctb()$id==click$id],"</b>"))
+    review_text = c(paste('<span style="color:#5F5DA3"> The Most Current Review: </span>', paste("<br><b>",ctb()[!duplicated(ctb()[,1]),]$review_text[ctb()[!duplicated(ctb()[,1]),]$id==click$id],"</b>")))
+    review_rating = c(paste('<span style="color:#5F5DA3"> Rating of This Reviewer: </span>') ,paste("<b>",ctb()[!duplicated(ctb()[,1]),]$review_rating[ctb()[!duplicated(ctb()[,1]),]$id==click$id],"</b>"))
+    review_time = c(paste('<span style="color:#5F5DA3"> The Rating Time: </span>'), paste("<br><b>",ctb()[!duplicated(ctb()[,1]),]$review_time[ctb()[!duplicated(ctb()[,1]),]$id==click$id],"</b>"))
     
-
+    
     output$Click_review_text<-renderText({review_text})
     output$Click_review_rating<-renderText({review_rating})
     output$Click_review_time<-renderText({review_time})
@@ -272,15 +268,22 @@ shinyServer = function(input, output, session) {
         return(NULL)
       else{
         src<-ctb()$image_url[ctb()$id==click$id]
-        return(tags$img(src=src, width = '200px', height='200px'))
+        return(tags$img(src=src, width = '300px', height='200px'))
       }
     })
   })
+  
+  output$Overview = renderText({
+    paste("<b>","The purpose of this project is ...")
+  })
+  
+  output$mytable <- renderDataTable({
+    unique(ctb()[,c(2,5,6,7,8,11,13)] %>% filter(rating >= input$minStar & as.numeric(ctb()$price) <= input$maxPrice))
+  })
+  
 }
-    
+
 #output$text1 <- renderText({ paste("hello input is","<font color=\"#FF0000\"><b>", input$n, "</b></font>") })
 
 #paste('<span class="red">',"The most current review:</span>","<br>",ctb()$review_text[ctb()$id==click$id])
-
-
 
