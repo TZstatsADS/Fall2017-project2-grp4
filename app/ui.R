@@ -52,7 +52,7 @@ dashboardPage(
                 menuItem("About",tabName="home",icon=icon("user-circle"))
     ),
     textInput("from","Enter Point A:",'Times Square, New York'),
-    textInput("to","Enter Point B:",'JFK, New York'),
+    textInput("to","Enter Point B:",'Columbia University, New York'),
     numericInput("in_mile","Max Dist From Your Route (mi)",0.2, min = 0.1, max = 5),
     sliderInput("minStar","Minimum # of stars on Yelp",min = 1, max = 5, value = 1, step = 0.5),
     sliderInput("maxPrice","Price Range",min = 1, max = 4, value = 4, step = 1),
@@ -91,8 +91,7 @@ dashboardPage(
               fluidRow(
                 column(width=12,
                        collapsible=T,
-                       includeMarkdown('overview.md')
-                
+                       includeMarkdown('../doc/overview.md')
                 )
               )
       )
